@@ -1,0 +1,23 @@
+# Settings:
+# bulwark_size:     The size of a placed bulwark zone.
+# block_type:       The block type, that needs to be reinforced, to create a bulwark.
+# bulwark_creation: If this is set to false, no new bulwarks can be created.
+# no_reinforce:     Prevents people from reinforcing stuff inside a bulwark if they are not members of the bulwark.
+# no_lava:  Prevents non-members from placing lava inside a bulwark,
+#           also stops lava from spreading inside / into a bulwark.
+# no_water: Prevents non-members from placing water inside a bulwark,
+#           also stops water from spreading inside / into a bulwark.
+# no_pearl: Prevents pearling through / out / into a bulwark.
+#           (Might be heavy on server resources, this involves quite some math.
+# allow_group_pearl: Allows members of bulwarks to pearl through / out / into a bulwark.
+
+
+bulwark_size: 11
+block_type: REDSTONE_BLOCK
+
+bulwark_creation: true
+no_reinforce: true
+no_lava: true
+no_water: true
+no_pearl: true
+allow_group_pearl: true

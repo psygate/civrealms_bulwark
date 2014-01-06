@@ -1,0 +1,32 @@
+name: Bulwark
+version: 0.0.1a
+description: Allows players to create blocks that prevent lava / water placement in an area. Also can prevent players from pearling through or into an area.
+author: psygate
+database: true
+main: com.psygate.bulwark.BulwarkPlugin
+depend: [Citadel]
+commands:
+  bwtoggle:
+    description: Toggles creation of bulwarks. On -> New bulwarks can be created. Off -> No new bulwarks will be created.
+    aliases: [bwt]
+    usage: /bwtoggle
+  bwtoggle_no_reinforce:
+    description: Sets the "no reinforcement" mode to on or off. On -> Citadel reinforcement is blocked for non-members in a bulwark area.
+    aliases: [bwtnr, bwtr]
+    usage: /bwtoggle_no_reinforce
+  bwtoggle_no_lava:
+    description: Sets the "no lava" mode to on or off. On -> Lava cannot be placed by non members inside bulwarks.
+    aliases: [bwtnl, bwtl]
+    usage: /bwtoggle_no_lava
+  bwtoggle_no_water:
+    description: Sets the "no water" mode to on or off. On -> Water cannot be placed by non members inside bulwarks.
+    aliases: [bwtnw, bwtw]
+    usage: /bwtoggle_no_water
+  bwtoggle_no_pearl:
+    description: Sets the "no pearl" mode to on or off. On -> You cannot teleport through bulwarks by throwing pearls.
+    aliases: [bwtnp, bwtp]
+    usage: /bwtoggle_no_pearl
+  bwtoggle_group_pearl:
+    description: Sets the "group pearl" mode to on or off. On -> You can teleport through bulwarks by throwing pearls AND being a member of the bulwark.
+    aliases: [bwtng, bwtg]
+    usage: /bwtoggle_group_pearl
