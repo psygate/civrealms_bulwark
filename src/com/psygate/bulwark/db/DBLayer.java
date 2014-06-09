@@ -17,7 +17,9 @@ import com.psygate.bulwark.entity.Bulwark;
  * 
  *         a simple and easy abstraction to access the database. Calls to the
  *         database should route through here.<br>
- *         <ul><li>TODO: Add a cache layer.</li></ul>
+ *         <ul>
+ *         <li>TODO: Add a cache layer.</li>
+ *         </ul>
  */
 public class DBLayer {
 	private EbeanServer serv;
