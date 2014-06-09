@@ -19,3 +19,9 @@ Bulwark is configurable, but there are some things that can be prevented with it
 * **Lava griefing**: Lava cannot be placed by non-citadel group member inside a bulwark. If lava is to move or drop into a bulwark area, it is stopped from doing so.
 * **Water griefing**: The same as with lava.
 * **Pearl-Teleporting**: Bulwarks can stop anyone from pearling through / in / out of a bulwark area. There is an option to allow group members to pass through a friendly bulwark.
+=======
+civrealms_bulwark
+=================
+
+Plugin for player driven foritication for the civrealms server
+
