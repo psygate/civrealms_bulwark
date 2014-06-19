@@ -23,6 +23,7 @@ Bulwark is configurable, but there are some things that can be prevented with it
 * **Water griefing**: The same as with lava.
 
 * **Pearl-Teleporting**: Bulwarks can stop anyone from pearling through / in / out of a bulwark area. There is an option to allow group members to pass through a friendly bulwark.
+
 =======
 civrealms_bulwark
 =================
