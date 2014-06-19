@@ -57,7 +57,7 @@ public class LavaListener implements Listener {
 			return;
 		}
 		if (ev.getBucket().equals(Material.LAVA_BUCKET)) {
-			List<Bulwark> bastlist = BulwarkPlugin.getDB().getContaining(ev.getBlockClicked());
+			List<? extends Bulwark> bastlist = BulwarkPlugin.getDB().getContaining(ev.getBlockClicked());
 			for (Bulwark bulwark : bastlist) {
 				IReinforcement reinf = Citadel.getReinforcementManager().getReinforcement(bulwark.getLocation());
 				if (reinf instanceof PlayerReinforcement) {
@@ -93,7 +93,7 @@ public class LavaListener implements Listener {
 			return;
 		}
 		if (ev.getBlock().getType().equals(Material.LAVA) || ev.getBlock().getType().equals(Material.STATIONARY_LAVA)) {
-			List<Bulwark> bastlist = BulwarkPlugin.getDB().getContaining(ev.getToBlock());
+			List<? extends Bulwark> bastlist = BulwarkPlugin.getDB().getContaining(ev.getToBlock());
 			if (!bastlist.isEmpty()) {
 				ev.setCancelled(true);
 				ev.getBlock().setType(Material.STATIONARY_LAVA);

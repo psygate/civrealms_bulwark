@@ -10,23 +10,67 @@ commands:
     description: Toggles creation of bulwarks. On -> New bulwarks can be created. Off -> No new bulwarks will be created.
     aliases: [bwt]
     usage: /bwtoggle
+    permission: bulwark.toggle.creation
   bwtoggle_no_reinforce:
     description: Sets the "no reinforcement" mode to on or off. On -> Citadel reinforcement is blocked for non-members in a bulwark area.
     aliases: [bwtnr, bwtr]
     usage: /bwtoggle_no_reinforce
+    permission: bulwark.toggle.reinforcement
   bwtoggle_no_lava:
     description: Sets the "no lava" mode to on or off. On -> Lava cannot be placed by non members inside bulwarks.
     aliases: [bwtnl, bwtl]
     usage: /bwtoggle_no_lava
+    permission: bulwark.toggle.nolava
   bwtoggle_no_water:
     description: Sets the "no water" mode to on or off. On -> Water cannot be placed by non members inside bulwarks.
     aliases: [bwtnw, bwtw]
     usage: /bwtoggle_no_water
+    permission: bulwark.toggle.nowater
   bwtoggle_no_pearl:
     description: Sets the "no pearl" mode to on or off. On -> You cannot teleport through bulwarks by throwing pearls.
     aliases: [bwtnp, bwtp]
     usage: /bwtoggle_no_pearl
+    permission: bulwark.toggle.nopearl
   bwtoggle_group_pearl:
     description: Sets the "group pearl" mode to on or off. On -> You can teleport through bulwarks by throwing pearls AND being a member of the bulwark.
     aliases: [bwtng, bwtg]
     usage: /bwtoggle_group_pearl
+    permission: bulwark.toggle.grouppearl
+  bwtoggle_damage_mitigation:
+    description: Sets the damage mitigation mode on or off. On -> Damage mitigation by age of bulwark.
+    aliases: [bwtdm, bwtm]
+    usage: /bwtoggle_damage_mitigation
+    permission: bulwark.toggle.damagemitigation
+  bw_show_mitigation:
+    description: Shows the current mitigation level of the bulwark.
+    aliases: [bwsm, bwml]
+    usage: /bw_show_mitigation
+    permission: bulwark.info.mitigationlevel
+  bw_age:
+    description: Sets the age of an advanced bulwark in which you currently stand.
+    aliases: [bwsa]
+    usage: /bw_age
+    permission: bulwark.modify.age
+
+permissions:
+  bulwark.toggle.*:
+    description: Gives access to enable/disable bulwark feature commands.
+    default: op
+    children:
+      bulwark.toggle.creation: true
+      bulwark.toggle.reinforcement: true
+      bulwark.toggle.nolava: true
+      bulwark.toggle.nowater: true
+      bulwark.toggle.nopearl: true
+      bulwark.toggle.grouppearl: true
+      bulwark.toggle.damagemitigation: true
+  bulwark.info.*:
+    description: General information command about bulwarks.
+    default: true
+    children: 
+      bulwark.info.mitigationlevel: true
+  bulwark.modify.*:
+    description: General modification command for bulwarks.
+    default: op
+    children: 
+      bulwark.modify.age: true

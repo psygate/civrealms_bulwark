@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
@@ -27,6 +28,7 @@ import org.bukkit.block.Block;
  *         upper point (ubx,uby,ubz). A bounding box is ALWAYS axis aligned.</li>
  *         </ul>
  */
+@MappedSuperclass
 @Entity
 @UniqueConstraint(columnNames = { "x", "y", "z", "worlduid" })
 public class Bulwark {
@@ -86,6 +88,19 @@ public class Bulwark {
 		uby = y + size;
 		ubz = z + size;
 		loc = center.getLocation();
+	}
+
+	public Bulwark(Bulwark old) {
+		this.size = old.size;
+		this.x = old.x;
+		this.y = old.y;
+		z = old.z;
+		worlduid = old.worlduid;
+		lbx = old.lbx;
+		lby = old.lby;
+		ubx = old.ubx;
+		uby = old.uby;
+		ubz = old.ubz;
 	}
 
 	/**
@@ -385,7 +400,8 @@ public class Bulwark {
 	 */
 	public Location getLocation() {
 		if (loc == null) {
-			loc = new Location(Bukkit.getWorld(UUID.fromString(getWorlduid())), getX(), getY(), getZ());
+			loc = new Location(Bukkit.getWorld(UUID.fromString(getWorlduid())),
+					getX(), getY(), getZ());
 		}
 
 		return loc;
@@ -419,7 +435,8 @@ public class Bulwark {
 			return false;
 		}
 
-		return from.getX() <= getUbx() && from.getX() >= getLbx() && from.getY() <= getUby() && from.getY() >= getLby()
+		return from.getX() <= getUbx() && from.getX() >= getLbx()
+				&& from.getY() <= getUby() && from.getY() >= getLby()
 				&& from.getZ() <= getUbz() && from.getZ() >= getLbz();
 	}
 
@@ -436,7 +453,8 @@ public class Bulwark {
 		result = prime * result + ubx;
 		result = prime * result + uby;
 		result = prime * result + ubz;
-		result = prime * result + ((worlduid == null) ? 0 : worlduid.hashCode());
+		result = prime * result
+				+ ((worlduid == null) ? 0 : worlduid.hashCode());
 		result = prime * result + x;
 		result = prime * result + y;
 		result = prime * result + z;
@@ -452,8 +470,8 @@ public class Bulwark {
 		if (!getClass().equals(obj.getClass()))
 			return false;
 		Bulwark other = (Bulwark) obj;
-//		if (id != other.id)
-//			return false;
+		// if (id != other.id)
+		// return false;
 		if (lbx != other.lbx)
 			return false;
 		if (lby != other.lby)

@@ -1,20 +1,35 @@
 package com.psygate.bulwark;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 import org.bukkit.Material;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.avaje.ebean.CallableSql;
+import com.avaje.ebean.Transaction;
+import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.psygate.bulwark.db.DBLayer;
 import com.psygate.bulwark.entity.Bulwark;
 import com.psygate.bulwark.entity.Configuration;
+import com.psygate.bulwark.entity.MitigatingBulwark;
 import com.psygate.bulwark.listeners.BulwarkListener;
 import com.psygate.bulwark.listeners.LavaListener;
+import com.psygate.bulwark.listeners.MitigationListener;
 import com.psygate.bulwark.listeners.NoPearlListener;
 import com.psygate.bulwark.listeners.ReinforceListener;
 import com.psygate.bulwark.listeners.WaterListener;
+import com.untamedears.citadel.Citadel;
+import com.untamedears.citadel.entity.Faction;
+import com.untamedears.citadel.entity.IReinforcement;
+import com.untamedears.citadel.entity.PlayerReinforcement;
+
 import org.bukkit.command.CommandExecutor;
 
 /**
@@ -32,31 +47,58 @@ public class BulwarkPlugin extends JavaPlugin {
 	private LavaListener ll;
 	private WaterListener wl;
 	private NoPearlListener np;
+	private MitigationListener ml;
 	private CommandExecutor acom;
+	public static float minimumMitigation, maximumMitigation;
+	public static long maturationTime, maturationStartAfter;
 
 	@Override
 	public void onEnable() {
-		try {
-			getDatabase().find(Bulwark.class).findRowCount();
-		} catch (Exception e) {
-			installDDL();
-		}
 		plugin = this;
+		ArrayList<String> singleCreateStmts = getSingleStatements();
+		for (String crt : singleCreateStmts) {
+			CallableSql stmt = getDatabase().createCallableSql(crt);
+			try {
+				getDatabase().execute(stmt);
+			} catch (Exception e) {
+				System.out.println("Non critical table creation error.");
+				System.out.println("Table probably already existed.");
+			}
+		}
+
 		db = new DBLayer(getDatabase());
+
+		if (getDatabase().find(Bulwark.class).findRowCount() > 0) {
+			migrate();
+		}
+
+		minimumMitigation = getFloat("mitigation.starting_at") / 100f;
+		maximumMitigation = getFloat("mitigation.capping_at") / 100f;
+		maturationTime = TimeUnit.DAYS
+				.toMillis((int) getFloat("mitigation.maturation_time"));
+		maturationStartAfter = TimeUnit.DAYS
+				.toMillis((int) getFloat("mitigation.mature_after"));
+
+		plugin = this;
 		// This doesn't do much atm, need to fix the mechanic first.
 		Material repmat = Material.AIR; // Material.valueOf(getConfig().getString("replace_material").toUpperCase());
 
-		ct = new BulwarkListener(new Configuration(this), getConfig().getBoolean("bulwark_creation"));
+		ct = new BulwarkListener(new Configuration(this), getConfig()
+				.getBoolean("bulwark_creation"));
 		rl = new ReinforceListener(getConfig().getBoolean("no_reinforce"));
 		ll = new LavaListener(repmat, getConfig().getBoolean("no_lava"));
 		wl = new WaterListener(repmat, getConfig().getBoolean("no_water"));
-		np = new NoPearlListener(getConfig().getBoolean("allow_group_pearl"), getConfig().getBoolean("no_pearl"));
+		np = new NoPearlListener(getConfig().getBoolean("allow_group_pearl"),
+				getConfig().getBoolean("no_pearl"));
+		ml = new MitigationListener(getConfig()
+				.getBoolean("mitigation_enabled"));
 
 		regListener(ct);
 		regListener(rl);
 		regListener(ll);
 		regListener(wl);
 		regListener(np);
+		regListener(ml);
 
 		acom = new AdminCommandExecutor(this);
 		setExecutor("bwtoggle", acom);
@@ -65,7 +107,9 @@ public class BulwarkPlugin extends JavaPlugin {
 		setExecutor("bwtoggle_no_water", acom);
 		setExecutor("bwtoggle_no_pearl", acom);
 		setExecutor("bwtoggle_group_pearl", acom);
-
+		setExecutor("bw_show_mitigation", acom);
+		setExecutor("bwtoggle_damage_mitigation", acom);
+		setExecutor("bw_age", acom);
 	}
 
 	private void setExecutor(String commandString, CommandExecutor executor) {
@@ -144,6 +188,13 @@ public class BulwarkPlugin extends JavaPlugin {
 		return state;
 	}
 
+	public boolean toggleMitigation() {
+		boolean state = ml.toggle();
+		getConfig().set("mitigation_enabled", state);
+		saveConfig();
+		return state;
+	}
+
 	private void regListener(Listener list) {
 		getServer().getPluginManager().registerEvents(list, this);
 	}
@@ -162,8 +213,53 @@ public class BulwarkPlugin extends JavaPlugin {
 	public List<Class<?>> getDatabaseClasses() {
 		List<Class<?>> classes = new LinkedList<Class<?>>();
 		classes.add(Bulwark.class);
+		classes.add(MitigatingBulwark.class);
 
 		return classes;
 	}
 
+	private void migrate() {
+		System.out.println("Migrating old bulwarks.");
+		List<Bulwark> warks = getDatabase().find(Bulwark.class).findList();
+		Iterator<Bulwark> migit = warks.iterator();
+
+		while (migit.hasNext()) {
+			Bulwark wark = migit.next();
+			MitigatingBulwark mitigatingBulwark = new MitigatingBulwark(wark);
+			getDB().persist(mitigatingBulwark);
+			migit.remove();
+			getDatabase().delete(wark);
+		}
+	}
+
+	private float getFloat(String path) {
+		return (float) getConfig().getDouble(path);
+	}
+
+	private ArrayList<String> getSingleStatements() {
+		SpiEbeanServer serv = (SpiEbeanServer) getDatabase();
+		String create = serv.getDdlGenerator().generateCreateDdl();
+		ArrayList<String> stats = new ArrayList<>();
+		ArrayList<Character> chars = new ArrayList<>();
+		for (char c : create.toCharArray()) {
+			chars.add(c);
+			if (c == ';') {
+				char[] str = new char[chars.size()];
+				for (int i = 0; i < str.length; i++) {
+					str[i] = chars.get(i);
+				}
+
+				stats.add(new String(str));
+				chars = new ArrayList<>();
+			}
+		}
+
+		char[] str = new char[chars.size()];
+		for (int i = 0; i < str.length; i++) {
+			str[i] = chars.get(i);
+		}
+
+		stats.add(new String(str));
+		return stats;
+	}
 }

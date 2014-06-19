@@ -73,7 +73,7 @@ public class BulwarkListener implements Listener {
 			return;
 		}
 		Bulwark bast = new Bulwark(conf.getSize(), ev.getBlock());
-		List<Bulwark> interl = BulwarkPlugin.getDB().getIntersecting(bast);
+		List<? extends Bulwark> interl = BulwarkPlugin.getDB().getIntersecting(bast);
 
 		for (Bulwark inters : interl) {
 			IReinforcement reinf = Citadel.getReinforcementManager().getReinforcement(inters.getLocation());

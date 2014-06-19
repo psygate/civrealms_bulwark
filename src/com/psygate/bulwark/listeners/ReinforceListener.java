@@ -50,7 +50,7 @@ public class ReinforceListener implements Listener {
 		if (!on) {
 			return;
 		}
-		List<Bulwark> basts = BulwarkPlugin.getDB().getContaining(ev.getBlock());
+		List<? extends Bulwark> basts = BulwarkPlugin.getDB().getContaining(ev.getBlock());
 		for (Bulwark bast : basts) {
 			IReinforcement reinf = Citadel.getReinforcementManager().getReinforcement(bast.getLocation());
 			if (reinf instanceof PlayerReinforcement) {

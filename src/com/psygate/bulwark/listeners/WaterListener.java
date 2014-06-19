@@ -56,7 +56,7 @@ public class WaterListener implements Listener {
 			return;
 		}
 		if (ev.getBucket().equals(Material.WATER_BUCKET)) {
-			List<Bulwark> bastlist = BulwarkPlugin.getDB().getContaining(ev.getBlockClicked());
+			List<? extends Bulwark> bastlist = BulwarkPlugin.getDB().getContaining(ev.getBlockClicked());
 			for (Bulwark bulwark : bastlist) {
 				IReinforcement reinf = Citadel.getReinforcementManager().getReinforcement(bulwark.getLocation());
 				if (reinf instanceof PlayerReinforcement) {
@@ -92,7 +92,7 @@ public class WaterListener implements Listener {
 			return;
 		}
 		if (ev.getBlock().getType().equals(Material.WATER) || ev.getBlock().getType().equals(Material.STATIONARY_WATER)) {
-			List<Bulwark> bastlist = BulwarkPlugin.getDB().getContaining(ev.getToBlock());
+			List<? extends Bulwark> bastlist = BulwarkPlugin.getDB().getContaining(ev.getToBlock());
 			if (!bastlist.isEmpty()) {
 				ev.setCancelled(true);
 				ev.getBlock().setType(Material.STATIONARY_WATER);

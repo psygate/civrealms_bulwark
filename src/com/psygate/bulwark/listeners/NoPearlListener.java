@@ -85,7 +85,7 @@ public class NoPearlListener implements Listener {
 			// drawBB((int) ax, (int) ay, (int) az, (int) bx, (int) by, (int)
 			// bz, w, ev.getPlayer());
 
-			List<Bulwark> warks = BulwarkPlugin.getDB().getIntersecting(ax, ay, az, bx, by, bz, w);
+			List<? extends Bulwark> warks = BulwarkPlugin.getDB().getIntersecting(ax, ay, az, bx, by, bz, w);
 
 			// ev.getPlayer().sendMessage("Pearling through " + warks.size() +
 			// " Bulwarks.");

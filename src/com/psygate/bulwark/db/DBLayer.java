@@ -10,6 +10,7 @@ import com.avaje.ebean.Expr;
 import com.avaje.ebean.Expression;
 import com.avaje.ebean.Query;
 import com.psygate.bulwark.entity.Bulwark;
+import com.psygate.bulwark.entity.MitigatingBulwark;
 
 /**
  * 
@@ -42,7 +43,15 @@ public class DBLayer {
 	 *            stored.
 	 */
 	public void persist(Bulwark bulw) {
+		serv.save(new MitigatingBulwark(bulw));
+	}
+	
+	public void persist(MitigatingBulwark bulw) {
 		serv.save(bulw);
+	}
+	
+	public void update(MitigatingBulwark bw) {
+		serv.update(bw);
 	}
 
 	/**
@@ -52,6 +61,10 @@ public class DBLayer {
 	 *            Bulwark to remove. Must be != null and already stored.
 	 */
 	public void delete(Bulwark bulw) {
+		serv.delete(bulw);
+	}
+
+	public void delete(MitigatingBulwark bulw) {
 		serv.delete(bulw);
 	}
 
@@ -68,14 +81,16 @@ public class DBLayer {
 	 * @return List of bulwarks containing the provided block. If none are
 	 *         found, an empty list is returned.
 	 */
-	public List<Bulwark> getContaining(Block block) {
+	public List<MitigatingBulwark> getContaining(Block block) {
 		int x = block.getX();
 		int y = block.getY();
 		int z = block.getZ();
-		Query<Bulwark> query = serv.createQuery(Bulwark.class);
+		Query<MitigatingBulwark> query = serv
+				.createQuery(MitigatingBulwark.class);
 
 		// Basic query if something is in a cube."In" includes the side planes.
-		query.where().le("lbx", x).le("lby", y).le("lbz", z).ge("ubx", x).ge("uby", y).ge("ubz", z)
+		query.where().le("lbx", x).le("lby", y).le("lbz", z).ge("ubx", x)
+				.ge("uby", y).ge("ubz", z)
 				.eq("worlduid", block.getWorld().getUID().toString());
 		return query.findList();
 	}
@@ -89,13 +104,15 @@ public class DBLayer {
 	 * @return Bulwark that is associated with the block, or null, if none are
 	 *         associated with the block.
 	 */
-	public Bulwark get(Block block) {
+	public MitigatingBulwark get(Block block) {
 		int x = block.getX();
 		int y = block.getY();
 		int z = block.getZ();
-		Query<Bulwark> query = serv.createQuery(Bulwark.class);
+		Query<MitigatingBulwark> query = serv
+				.createQuery(MitigatingBulwark.class);
 
-		query.where().eq("x", x).eq("y", y).eq("z", z).eq("worlduid", block.getWorld().getUID().toString());
+		query.where().eq("x", x).eq("y", y).eq("z", z)
+				.eq("worlduid", block.getWorld().getUID().toString());
 		return query.findUnique();
 	}
 
@@ -110,10 +127,11 @@ public class DBLayer {
 	 * @return List of intersecting bulwarks. If none intersect, an empty list
 	 *         is returned.
 	 */
-	public List<Bulwark> getIntersecting(Bulwark nb) {
+	public List<MitigatingBulwark> getIntersecting(Bulwark nb) {
 		// basic cube intersection query
 
-		Query<Bulwark> query = serv.createQuery(Bulwark.class);
+		Query<MitigatingBulwark> query = serv
+				.createQuery(MitigatingBulwark.class);
 
 		int lx = nb.getLbx();
 		int ux = nb.getUbx();
@@ -123,9 +141,9 @@ public class DBLayer {
 		int uz = nb.getUbz();
 		String wid = nb.getWorlduid();
 
-		query.where().ge("ubx", lx).le("lbx", ux).ge("uby", ly).le("lby", uy).ge("ubz", lz).le("lbz", uz)
-				.eq("worlduid", wid);
-		List<Bulwark> list = query.findList();
+		query.where().ge("ubx", lx).le("lbx", ux).ge("uby", ly).le("lby", uy)
+				.ge("ubz", lz).le("lbz", uz).eq("worlduid", wid);
+		List<MitigatingBulwark> list = query.findList();
 		return list;
 	}
 
@@ -157,7 +175,8 @@ public class DBLayer {
 	 * @return A list of bulwarks that intersect OR touch the provided bounding
 	 *         box. An empty list is returned if no bulwarks intersect.
 	 */
-	public List<Bulwark> getIntersecting(float ax, float ay, float az, float bx, float by, float bz, World w) {
+	public List<MitigatingBulwark> getIntersecting(float ax, float ay,
+			float az, float bx, float by, float bz, World w) {
 		int lx = (int) min(ax, bx);
 		int ly = (int) min(ay, by);
 		int lz = (int) min(az, bz);
@@ -166,10 +185,18 @@ public class DBLayer {
 		int uy = (int) max(ay, by) + 1;
 		int uz = (int) max(az, bz) + 1;
 
-		Query<Bulwark> query = serv.createQuery(Bulwark.class);
+		Query<MitigatingBulwark> query = serv
+				.createQuery(MitigatingBulwark.class);
 
-		query.where().ge("ubx", lx).le("lbx", ux).ge("uby", ly).le("lby", uy).ge("ubz", lz).le("lbz", uz)
+		query.where().ge("ubx", lx).le("lbx", ux).ge("uby", ly).le("lby", uy)
+				.ge("ubz", lz).le("lbz", uz)
 				.eq("worlduid", w.getUID().toString());
+		return query.findList();
+	}
+
+	public List<MitigatingBulwark> getAllBulwarks() {
+		Query<MitigatingBulwark> query = serv
+				.createQuery(MitigatingBulwark.class);
 		return query.findList();
 	}
 

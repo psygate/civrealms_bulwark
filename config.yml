@@ -21,3 +21,11 @@ no_lava: true
 no_water: true
 no_pearl: true
 allow_group_pearl: true
+#All following numbers in the section mitigation are in percent
+#Except maturation_time and mature_after, these are in days.
+mitigation_enabled: true
+mitigation:
+  starting_at: 2
+  capping_at: 50
+  maturation_time: 14
+  mature_after: 1
