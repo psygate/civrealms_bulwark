@@ -24,6 +24,8 @@ Bulwark is configurable, but there are some things that can be prevented with it
 
 * **Pearl-Teleporting**: Bulwarks can stop anyone from pearling through / in / out of a bulwark area. There is an option to allow group members to pass through a friendly bulwark.
 
+* **Damage-Mitigation**: Bulwarks can prevent damage by a certain percentage, depending on their age. Maturation starts after X days.
+
 =======
 civrealms_bulwark
 =================
